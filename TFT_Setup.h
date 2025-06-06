@@ -13,23 +13,30 @@
 #include "hardware_hal.h"
 
 // Dynamische TFT Konfiguration basierend auf Hardware Profile
+// Dynamische TFT Konfiguration basierend auf Hardware Profile
 #if HW_DISPLAY_CONTROLLER == ILI9341
-  #define ILI9341_DRIVER
+  #define ILI9341_2_DRIVER
   #if HARDWARE_PROFILE == ESP32_2432S028R
-    #define TFT_RGB_ORDER TFT_RGB
-    #define TFT_INVERSION_OFF
+    #define TFT_RGB_ORDER TFT_BGR
+    #define TFT_INVERSION_ON
+    #define TFT_WIDTH  HW_DISPLAY_WIDTH    // 320
+    #define TFT_HEIGHT HW_DISPLAY_HEIGHT   // 240
   #else
     #define TFT_RGB_ORDER TFT_RGB
     #define TFT_INVERSION_OFF
+    #define TFT_WIDTH  HW_DISPLAY_WIDTH
+    #define TFT_HEIGHT HW_DISPLAY_HEIGHT
   #endif
 #elif HW_DISPLAY_CONTROLLER == ST7789
   #define ST7789_DRIVER
   #define TFT_RGB_ORDER TFT_RGB
   #define TFT_INVERSION_OFF
+  #define TFT_WIDTH  HW_DISPLAY_WIDTH
+  #define TFT_HEIGHT HW_DISPLAY_HEIGHT
 #endif
 
-#define TFT_WIDTH  240  // Fest statt HW_DISPLAY_WIDTH
-#define TFT_HEIGHT 320  // Fest statt HW_DISPLAY_HEIGHT
+#define TFT_WIDTH  HW_DISPLAY_WIDTH
+#define TFT_HEIGHT HW_DISPLAY_HEIGHT
 #define TFT_MISO   HW_DISPLAY_MISO
 #define TFT_MOSI   HW_DISPLAY_MOSI
 #define TFT_SCLK   HW_DISPLAY_SCLK

@@ -144,57 +144,96 @@ void HardwareManager::getTouchPoint(int* x, int* y) {
     *y = -1;
     return;
   }
-  
+
   TS_Point p = touch.getPoint();
   int rotation = tft.getRotation();
-  
-  // Hardware-spezifisches Touch-Mapping
+  int tx = 0, ty = 0;
+
   switch (rotation) {
     case 0: // Portrait
       #ifdef HW_TOUCH_MAP_PORTRAIT
-        HW_TOUCH_MAP_PORTRAIT(p.x, p.y, *x, *y);
+        HW_TOUCH_MAP_PORTRAIT(p.x, p.y, tx, ty);
       #else
-        *x = map(p.x, HW_TOUCH_MIN_X, HW_TOUCH_MAX_X, 0, tft.width());
-        *y = map(p.y, HW_TOUCH_MIN_Y, HW_TOUCH_MAX_Y, 0, tft.height());
+        tx = map(p.x, HW_TOUCH_MIN_X, HW_TOUCH_MAX_X, 0, tft.width());
+        ty = map(p.y, HW_TOUCH_MIN_Y, HW_TOUCH_MAX_Y, 0, tft.height());
+      #endif
+      // Invertierung für ROTATION 0
+      #ifdef HW_TOUCH_INVERT_X_ROT0
+        if (HW_TOUCH_INVERT_X_ROT0) tx = tft.width() - tx;
+      #elif defined(HW_TOUCH_INVERT_X)
+        if (HW_TOUCH_INVERT_X) tx = tft.width() - tx;
+      #endif
+      #ifdef HW_TOUCH_INVERT_Y_ROT0
+        if (HW_TOUCH_INVERT_Y_ROT0) ty = tft.height() - ty;
+      #elif defined(HW_TOUCH_INVERT_Y)
+        if (HW_TOUCH_INVERT_Y) ty = tft.height() - ty;
       #endif
       break;
-      
+
     case 1: // Landscape
       #ifdef HW_TOUCH_MAP_LANDSCAPE
-        HW_TOUCH_MAP_LANDSCAPE(p.x, p.y, *x, *y);
+        HW_TOUCH_MAP_LANDSCAPE(p.x, p.y, tx, ty);
       #else
-        *x = map(p.y, HW_TOUCH_MIN_Y, HW_TOUCH_MAX_Y, 0, tft.width());
-        *y = map(p.x, HW_TOUCH_MAX_X, HW_TOUCH_MIN_X, 0, tft.height());
+        tx = map(p.x, HW_TOUCH_MIN_X, HW_TOUCH_MAX_X, 0, tft.width());
+        ty = map(p.y, HW_TOUCH_MIN_Y, HW_TOUCH_MAX_Y, 0, tft.height());
+      #endif
+      // Invertierung für ROTATION 1
+      #ifdef HW_TOUCH_INVERT_X_ROT1
+        if (HW_TOUCH_INVERT_X_ROT1) tx = tft.width() - tx;
+      #elif defined(HW_TOUCH_INVERT_X)
+        if (HW_TOUCH_INVERT_X) tx = tft.width() - tx;
+      #endif
+      #ifdef HW_TOUCH_INVERT_Y_ROT1
+        if (HW_TOUCH_INVERT_Y_ROT1) ty = tft.height() - ty;
+      #elif defined(HW_TOUCH_INVERT_Y)
+        if (HW_TOUCH_INVERT_Y) ty = tft.height() - ty;
       #endif
       break;
-      
+
     case 2: // Portrait inverted
-      *x = map(p.x, HW_TOUCH_MAX_X, HW_TOUCH_MIN_X, 0, tft.width());
-      *y = map(p.y, HW_TOUCH_MAX_Y, HW_TOUCH_MIN_Y, 0, tft.height());
+      #ifdef HW_TOUCH_MAP_PORTRAIT_INV
+        HW_TOUCH_MAP_PORTRAIT_INV(p.x, p.y, tx, ty);
+      #else
+        tx = map(p.x, HW_TOUCH_MAX_X, HW_TOUCH_MIN_X, 0, tft.width());
+        ty = map(p.y, HW_TOUCH_MAX_Y, HW_TOUCH_MIN_Y, 0, tft.height());
+      #endif
+      // Invertierung für ROTATION 2
+      #ifdef HW_TOUCH_INVERT_X_ROT2
+        if (HW_TOUCH_INVERT_X_ROT2) tx = tft.width() - tx;
+      #elif defined(HW_TOUCH_INVERT_X)
+        if (HW_TOUCH_INVERT_X) tx = tft.width() - tx;
+      #endif
+      #ifdef HW_TOUCH_INVERT_Y_ROT2
+        if (HW_TOUCH_INVERT_Y_ROT2) ty = tft.height() - ty;
+      #elif defined(HW_TOUCH_INVERT_Y)
+        if (HW_TOUCH_INVERT_Y) ty = tft.height() - ty;
+      #endif
       break;
-      
+
     case 3: // Landscape inverted
-      *x = map(p.y, HW_TOUCH_MAX_Y, HW_TOUCH_MIN_Y, 0, tft.width());
-      *y = map(p.x, HW_TOUCH_MIN_X, HW_TOUCH_MAX_X, 0, tft.height());
+      #ifdef HW_TOUCH_MAP_LANDSCAPE_INV
+        HW_TOUCH_MAP_LANDSCAPE_INV(p.x, p.y, tx, ty);
+      #else
+        tx = map(p.x, HW_TOUCH_MAX_X, HW_TOUCH_MIN_X, 0, tft.width());
+        ty = map(p.y, HW_TOUCH_MIN_Y, HW_TOUCH_MAX_Y, tft.height(), 0);
+      #endif
+      // Invertierung für ROTATION 3
+      #ifdef HW_TOUCH_INVERT_X_ROT3
+        if (HW_TOUCH_INVERT_X_ROT3) tx = tft.width() - tx;
+      #elif defined(HW_TOUCH_INVERT_X)
+        if (HW_TOUCH_INVERT_X) tx = tft.width() - tx;
+      #endif
+      #ifdef HW_TOUCH_INVERT_Y_ROT3
+        if (HW_TOUCH_INVERT_Y_ROT3) ty = tft.height() - ty;
+      #elif defined(HW_TOUCH_INVERT_Y)
+        if (HW_TOUCH_INVERT_Y) ty = tft.height() - ty;
+      #endif
       break;
   }
-  
-  // Touch-Inversion anwenden
-  #ifdef HW_TOUCH_INVERT_X
-    if (HW_TOUCH_INVERT_X) {
-      *x = tft.width() - *x;
-    }
-  #endif
-  
-  #ifdef HW_TOUCH_INVERT_Y
-    if (HW_TOUCH_INVERT_Y) {
-      *y = tft.height() - *y;
-    }
-  #endif
-  
+
   // Koordinaten begrenzen
-  *x = constrain(*x, 0, tft.width() - 1);
-  *y = constrain(*y, 0, tft.height() - 1);
+  *x = constrain(tx, 0, tft.width() - 1);
+  *y = constrain(ty, 0, tft.height() - 1);
 }
 
 int HardwareManager::getTouchCount() {
