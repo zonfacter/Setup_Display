@@ -71,6 +71,82 @@ Die Einstellungen werden im Hardware-Profil festgelegt.
 - **Display:** Je nach Modell an die entsprechenden SPI-Pins des ESP32 anschließen.
 - **Touch:** XPT2046 ebenfalls an SPI (oft getrenntes CS & IRQ).
 - **Backlight:** Optionaler Pin für Helligkeitsregelung.
+# ESP32 Hardware-Kommissionierung & Test-Tool
+
+Dieses eigenständige Programm dient zur schnellen Inbetriebnahme, zum Testen und zur Kalibrierung von ESP32 Touch-Displays (z.B. ILI9341/ST7789 + XPT2046).  
+Du kannst damit sämtliche Display- und Touchfunktionen sowie Backlight und Rotation prüfen – direkt per Menü über den Seriellen Monitor.
+
+---
+
+## **Schnellstart**
+
+1. **Hardware-Profil anpassen:**  
+   In der Datei ganz oben `#define HARDWARE_PROFILE ESP32_DEIN_PROFILE` setzen (Profil siehe `config.h`/`hardware_hal.h`).
+
+2. **Kompilieren & Flashen:**  
+   Programm als `hardware_commissioning.ino` in die Arduino IDE laden, Board & Port wählen, hochladen.
+
+3. **Seriellen Monitor öffnen:**  
+   Baudrate auf 115200 stellen.
+
+4. **Test-Menü nutzen:**  
+   Per Tastendruck (1-9, 0) gewünschte Tests starten, Anweisungen im Terminal und auf dem Display folgen.
+
+---
+
+## **Test-Menü Übersicht**
+
+| Taste | Test-Modus                     | Beschreibung                                                   |
+|-------|-------------------------------|----------------------------------------------------------------|
+| 1     | Display Test                  | Grundlegende Display-Ausgabe und Geometrie                     |
+| 2     | Farb Test                     | Normale & invertierte Farben, RGB-Komponenten                  |
+| 3     | Backlight Test                | Helligkeitsregelung (PWM/Digital)                              |
+| 4     | Single Touch Test             | Einzel-Touch visualisieren und Rohdaten anzeigen               |
+| 5     | Multi Touch Test              | Mehrere Touchpunkte (sofern Hardware unterstützt)              |
+| 6     | Touch Kalibrierung            | Sammelt Min/Max-Rohwerte, gibt Profil-Defines für Mapping aus  |
+| 7     | Orientierungs Test            | Testet alle Display-Rotationen und zeigt Markierungen/Ecken    |
+| 8     | Stress Test                   | Viele schnelle Grafikoperationen zur Stabilitätsprüfung        |
+| 9     | Hardware Info                 | Zeigt alle Profil- und Systeminfos im Terminal                 |
+| 0     | Menü erneut anzeigen          | Zeigt das Hauptmenü erneut an                                  |
+| q     | Test beenden                  | Bricht aktuellen Test ab und kehrt zum Menü zurück             |
+
+---
+
+## **Bedienung & Hinweise**
+
+- Die Testauswahl erfolgt durch Tastendruck im Seriellen Monitor.
+- Während eines Tests kannst du mit 'q' jederzeit abbrechen.
+- Bei der **Touch-Kalibrierung** möglichst alle Ecken und die Mitte mehrfach berühren. Nach 30s werden die Werte als `#define`-Zeilen ausgegeben – diese kannst du direkt ins Hardware-Profil übernehmen!
+- **Backlight-Test:** Die Helligkeit wird automatisch hoch- und runtergeregelt, der aktuelle Wert wird angezeigt.
+- **Orientierungs-Test:** Nacheinander werden alle vier Rotationen gezeigt, mit farbigen Markern in den Ecken. So erkennst du, wie Touch und Anzeige zusammenpassen.
+- **Stress-Test:** Führt viele zufällige Grafikoperationen aus. Nutzbar für Dauer- und Stabilitätstests.
+
+---
+
+## **Typische Anpassungen**
+
+1. **Profil:**  
+   Passe das Hardware-Profil in der Sketch-Datei oder in den Headern an, damit Pins, Displaygröße und Touch-Mapping stimmen.
+
+2. **Touch-Kalibrierung:**  
+   Nach dem Kalibrier-Test die ausgegebenen Werte in dein Profil übernehmen:
+   ```c
+   #define HW_TOUCH_MIN_X ...
+   #define HW_TOUCH_MAX_X ...
+   #define HW_TOUCH_MIN_Y ...
+   #define HW_TOUCH_MAX_Y ...
+   ```
+
+3. **Mapping/Invertierung:**  
+   Falls Touch und Anzeige gespiegelt sind: Die Invertierungs-Makros (`HW_TOUCH_INVERT_X`, `HW_TOUCH_INVERT_Y`) im Profil anpassen und erneut testen.
+
+---
+
+## **Problemlösung**
+
+- **Display bleibt schwarz:** Verkabelung, Pin-Defines und Display-Treiber prüfen.
+- **Touch reagiert nicht:** SPI-Pins, CS/IRQ, Touch-Defines und Mapping kontrollieren.
+- **Falsche Ausrichtung:** Rotations- und Invertierungs-Makros im Profil ändern, ggf. Touch-Kalibrierung erneut durchführen.
 
 ## Lizenz
 
