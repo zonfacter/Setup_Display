@@ -1,0 +1,10 @@
+// config.h
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// *** WÄHLE DEIN HARDWARE PROFILE ***
+#define HARDWARE_PROFILE ESP32_2432S028R  // CYD USB-C Version 3 
+//#define HARDWARE_PROFILE ESP32_TZT_24
+//#define HARDWARE_PROFILE ESP32_GENERIC
+
+#endif
